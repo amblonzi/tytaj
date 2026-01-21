@@ -3,7 +3,7 @@ import { logger } from '../utils/logger';
 
 // Create Axios Instance
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
+  baseURL: import.meta.env.VITE_API_URL !== undefined ? import.meta.env.VITE_API_URL : 'http://127.0.0.1:8000',
 });
 
 // Request Interceptor: Add Token

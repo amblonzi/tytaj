@@ -23,8 +23,8 @@ def create_admin():
             print("Password reset to: admin123")
             return
         
-        # Hash password dynamically (Change this to use an environment variable in production)
-        hashed_pw = auth.get_password_hash("INITIAL_ADMIN_PASSWORD")
+        # Hash password dynamically
+        hashed_pw = auth.get_password_hash("admin123")
         
         # Create admin user with pre-hashed password
         admin = User(

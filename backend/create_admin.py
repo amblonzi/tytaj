@@ -41,7 +41,7 @@ def create_admin():
         
         print("Super Admin created successfully!")
         print("Email: admin@system.com")
-        print("Password: INITIAL_ADMIN_PASSWORD")
+        print("Password: admin123")
         print("IMPORTANT: Change this password immediately after first login!")
         print("Go to: Settings -> Account -> Change Password")
         

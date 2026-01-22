@@ -29,8 +29,7 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: 30
-      # CORS_ORIGINS should be updated to production domain
-      CORS_ORIGINS: "https://il.inphora.net"
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://tytaj.inphora.net,https://amari.inphora.net}
     depends_on:
       db:
         condition: service_healthy

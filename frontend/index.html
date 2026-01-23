@@ -11,7 +11,13 @@
     <script>
       (function() {
         const host = window.location.hostname.toLowerCase();
-        const brand = host.includes('amari') ? 'amari' : 'tytaj';
+        let brand = 'tytaj'; // default
+        
+        if (host.includes('amari')) {
+          brand = 'amari';
+        } else if (host.includes('il.')) {
+          brand = 'il';
+        }
         
         // Dynamic Manifest
         const manifest = document.createElement('link');
@@ -32,8 +38,13 @@
         appleIcon.href = `/${brand}-icon.png`;
         document.head.appendChild(appleIcon);
 
-        // Dynamic Title if needed
-        document.title = brand === 'amari' ? 'Amari - Lending System' : 'Tytaj - Lending System';
+        // Dynamic Title
+        const titles = {
+          'amari': 'AmariFlow - Lending System',
+          'tytaj': 'Tytaj Express - Lending System',
+          'il': 'Inphora - Lending System'
+        };
+        document.title = titles[brand] || 'Inphora - Lending System';
       })();
     </script>
   </head>

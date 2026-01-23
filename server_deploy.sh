@@ -18,17 +18,17 @@ else
 fi
 
 echo "Detailed Status:"
-docker-compose ps
+docker compose ps
 
 echo "Pulling and rebuilding..."
 # Stop containers first to ensure clean state (optional but safer for DB migrations if any)
-# docker-compose down 
+# docker compose down 
 
 # Build and start in detached mode
-docker-compose up --build -d
+docker compose up --build -d
 
 echo "Pruning unused images to save space..."
 docker system prune -f
 
 echo "Deployment complete at $(date)."
-docker-compose ps
+docker compose ps

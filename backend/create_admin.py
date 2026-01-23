@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Create Super Admin User for TytajExpress
+Create Super Admin User for Inphora Lending System
 Simple version using pre-hashed password to avoid bcrypt issues
 """
 
@@ -15,7 +15,7 @@ def create_admin():
     
     try:
         # Check if admin already exists
-        existing = db.query(User).filter(User.email == "admin@system.com").first()
+        existing = db.query(User).filter(User.email == "admin@inphora.net").first()
         if existing:
             print("Admin user exists. Resetting password...")
             existing.hashed_password = auth.get_password_hash("admin123")
@@ -28,7 +28,7 @@ def create_admin():
         
         # Create admin user with pre-hashed password
         admin = User(
-            email="admin@system.com",
+            email="admin@inphora.net",
             full_name="System Administrator",
             hashed_password=hashed_pw,
             role="admin",
@@ -40,7 +40,7 @@ def create_admin():
         db.commit()
         
         print("Super Admin created successfully!")
-        print("Email: admin@system.com")
+        print("Email: admin@inphora.net")
         print("Password: admin123")
         print("IMPORTANT: Change this password immediately after first login!")
         print("Go to: Settings -> Account -> Change Password")
@@ -52,5 +52,5 @@ def create_admin():
         db.close()
 
 if __name__ == "__main__":
-    print("Creating TytajExpress Super Admin...")
+    print("Creating Inphora Lending System Super Admin...")
     create_admin()

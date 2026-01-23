@@ -9,7 +9,8 @@ const getBrand = () => {
 };
 
 const brand = getBrand();
-const CACHE_NAME = `inphora-${brand}-v2`;
+const VERSION = 'v2.1';
+const CACHE_NAME = `inphora-${brand}-${VERSION}`;
 
 const urlsToCache = [
   '/',
@@ -37,40 +38,76 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          // Delete old caches including 'amariflow-v1'
+          // Delete old caches
           if (cacheName !== CACHE_NAME) {
-            console.log(`[${brand}] Deleting old cache: ${cacheName}`);
+            console.log(`[SW:${brand}] Deleting old cache: ${cacheName}`);
             return caches.delete(cacheName);
           }
         })
       );
+    }).then(() => {
+      return self.clients.claim();
     })
   );
-  self.clients.claim();
 });
 
-// Fetch event - network first for manifest, cache first for others
+// Fetch event - Robust strategy implementation
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
-  
+  const isNavigation = event.request.mode === 'navigate' || 
+                      url.pathname === '/' || 
+                      url.pathname === '/index.html';
+
   // Bypass cache for API requests
   if (url.pathname.startsWith('/api')) {
     return;
   }
 
-  // Always fetch fresh manifest
-  if (url.pathname.includes('manifest')) {
-    event.respondWith(fetch(event.request));
+  // Network First for Navigation and Manifest
+  if (isNavigation || url.pathname.includes('manifest')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // If successful, update cache and return
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return response;
+        })
+        .catch(() => {
+          // Fallback to cache if offline
+          return caches.match(event.request);
+        })
+    );
     return;
   }
 
+  // Cache First for other assets (images, fonts, scripts, styles)
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
         if (response) {
           return response;
         }
-        return fetch(event.request);
+        
+        // Dynamic caching for non-pre-cached assets
+        return fetch(event.request)
+          .then((networkResponse) => {
+            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+              return networkResponse;
+            }
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+            return networkResponse;
+          })
+          .catch((err) => {
+            console.warn(`[SW:${brand}] Fetch failed for: ${url.pathname}`, err);
+            // Return a null or error response instead of throwing
+            return new Response(null, { status: 404, statusText: 'Not Found' });
+          });
       })
   );
 });
